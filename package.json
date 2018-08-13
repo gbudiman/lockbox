@@ -1,0 +1,19 @@
+{
+  "name": "lockbox",
+  "version": "0.0.1",
+  "description": "Lockbox for shared secrets",
+  "main": "concept.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "ganache-cli": "^6.1.6",
+    "web3": "^1.0.0-beta.35"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "truffle test"
+  },
+  "author": "Gloria Budiman",
+  "license": "MIT"
+}
