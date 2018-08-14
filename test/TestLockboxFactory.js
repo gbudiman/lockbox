@@ -22,9 +22,8 @@ contract('LockboxFactory', async(accounts) => {
   })
 
   it('should assign shared secret correctly', async() => {
-    
     await instance.assign_shared_secret('sekrit', { from: customer })
-    let returned_secret = await instance.get_validity_period.call(customer)
+    let returned_secret = await instance.get_shared_secret({from: customer})
     assert(returned_secret, instance)
   })
 
@@ -37,7 +36,7 @@ contract('LockboxFactory', async(accounts) => {
     }
   })
 
-  describe('contract manipulation', async() => {
+  contract('contract manipulation', async() => {
     beforeEach('setup secret', async() => {
       await instance.assign_shared_secret('will be invalidated', { from: customer })
     })
@@ -45,7 +44,7 @@ contract('LockboxFactory', async(accounts) => {
     it('should be able to be invalidated by admin', async() => {
       await instance.set_validity_period(customer, 30, { from: admin })
       assert(await instance.get_validity_period(customer), 30)
-      assert(await instance.get_shared_secret(customer), 'INVALID')
+      assert(await instance.get_shared_secret({ from: customer }), 'INVALID')
     })
 
     it('should not be extendable', async() => {
@@ -58,7 +57,7 @@ contract('LockboxFactory', async(accounts) => {
     })
   })
 
-  describe('admin transfer', async() => {
+  contract('admin transfer', async() => {
     beforeEach('set next admin', async() => {
       let current_admin = await instance.get_current_admin()
       await instance.transfer_admin(other_admin, {from: admin})
@@ -72,16 +71,10 @@ contract('LockboxFactory', async(accounts) => {
         assert.isAbove(error.message.search('revert'), 0)
       }
     })
-    
+
     it('should allow admin transfer', async() => {
       await instance.claim_admin({from: other_admin})
       assert.isOk(await instance.is_admin.call({from: other_admin}))
     })
-
-
   })
-
-  
-
-  
 })

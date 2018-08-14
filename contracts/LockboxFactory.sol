@@ -26,8 +26,8 @@ contract LockboxFactory {
     address_to_lockbox_id[msg.sender] = id - 1;
   }
 
-  function get_shared_secret(address _address) external returns(string) {
-    uint256 id = address_to_lockbox_id[_address];
+  function get_shared_secret() external returns(string) {
+    uint256 id = address_to_lockbox_id[msg.sender];
     if (lockboxes[id].valid_until < now) {
       emit ExpiredSharedSecret(lockboxes[id].valid_until);
       return 'INVALID';
