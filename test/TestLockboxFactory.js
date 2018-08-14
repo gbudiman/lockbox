@@ -8,13 +8,6 @@ contract('LockboxFactory', async(accounts) => {
 
   beforeEach('setup contract before each test', async() => {
     instance = await LockboxFactory.deployed()
-    try {
-      await instance.set_admin(admin)
-    } catch(error) {
-      if (error.message.search('revert') < 0) {
-        throw('Administration error')
-      }
-    }
   })
 
   it('should have non-zero admin address', async() => {
@@ -29,7 +22,7 @@ contract('LockboxFactory', async(accounts) => {
 
   it('should not have admin overrideable', async() => {
     try {
-      await instance.set_admin(customer)
+      await instance.claim_admin({from: customer})
       assert.fail('Expecting transaction revert')
     } catch(error) {
       assert.isAbove(error.message.search('revert'), 0)
@@ -54,6 +47,13 @@ contract('LockboxFactory', async(accounts) => {
       } catch(error) {
         assert.isAbove(error.message.search('revert'), 0)
       }
+    })
+
+    it('should override existing shared secret', async() => {
+      let s1 = await instance.assign_shared_secret('hello world')
+      assert(await instance.get_shared_secret(), 'hello world')
+      let s2 = await instance.assign_shared_secret('updated world')
+      assert(await instance.get_shared_secret(), 'updated world')
     })
   })
 

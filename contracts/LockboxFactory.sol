@@ -10,7 +10,7 @@ contract LockboxFactory {
   }
 
   Lockbox[] public lockboxes;
-  address admin_address = 0;
+  address admin_address = msg.sender;
   address admin_transfer_address = 0;
   uint validity_period = 2 days;
   mapping ( address => uint256 ) address_to_lockbox_id;
@@ -38,12 +38,6 @@ contract LockboxFactory {
 
   function get_validity_period(address _address) external view returns(uint64) {
     return lockboxes[address_to_lockbox_id[_address]].valid_until;
-  }
-
-  function set_admin(address _address) external {
-    require(admin_address == 0);
-    admin_address = _address;
-    admin_transfer_address = 0;
   }
 
   function claim_admin() external {
