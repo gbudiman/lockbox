@@ -45,6 +45,7 @@ contract('LockboxFactory', async(accounts) => {
     it('should be able to be invalidated by admin', async() => {
       await instance.set_validity_period(customer, 30, { from: admin })
       assert(await instance.get_validity_period(customer), 30)
+      assert(await instance.get_shared_secret(customer), 'INVALID')
     })
 
     it('should not be extendable', async() => {
@@ -63,10 +64,21 @@ contract('LockboxFactory', async(accounts) => {
       await instance.transfer_admin(other_admin, {from: admin})
     })
 
+    it('should reject admin transfer from invalid transferee', async() => {
+      try {
+        await instance.claim_admin({from: customer})
+        assert.fail('Transfer can only be done to designated transferee')
+      } catch(error) {
+        assert.isAbove(error.message.search('revert'), 0)
+      }
+    })
+    
     it('should allow admin transfer', async() => {
       await instance.claim_admin({from: other_admin})
       assert.isOk(await instance.is_admin.call({from: other_admin}))
     })
+
+
   })
 
   
