@@ -2,6 +2,7 @@ pragma solidity ^0.4.24;
 
 contract LockboxFactory {
   event ExpiredSharedSecret(uint valid_until);
+  event AdminChanged();
 
   struct Lockbox {
     string shared_secret;
@@ -10,6 +11,7 @@ contract LockboxFactory {
 
   Lockbox[] public lockboxes;
   address admin_address = 0;
+  address admin_transfer_address = 0;
   uint validity_period = 2 days;
   mapping ( address => uint256 ) address_to_lockbox_id;
 
@@ -41,9 +43,25 @@ contract LockboxFactory {
   function set_admin(address _address) external {
     require(admin_address == 0);
     admin_address = _address;
+    admin_transfer_address = 0;
   }
 
-  function get_admin() external view returns(address) {
+  function claim_admin() external {
+    require(msg.sender == admin_transfer_address);
+    admin_address = msg.sender;
+    admin_transfer_address = 0;
+    emit AdminChanged();
+  }
+
+  function transfer_admin(address _address) only_admin external {
+    admin_transfer_address = _address;
+  }
+
+  function is_admin() external view returns(bool) {
+    return(msg.sender == admin_address);
+  }
+
+  function get_current_admin() external view returns(address) {
     return admin_address;
   }
 
